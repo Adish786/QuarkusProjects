@@ -1,4 +1,4 @@
-package org.code;
+package org.code.entity;
 
 public class Customer {
 
