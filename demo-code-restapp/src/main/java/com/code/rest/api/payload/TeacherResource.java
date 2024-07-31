@@ -1,10 +1,11 @@
-package com.ibm.rest.api.payload;
+package com.code.rest.api.payload;
 
-import com.ibm.rest.api.payload.entity.Teacher;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
 import java.util.List;
+
+import com.code.rest.api.payload.entity.Teacher;
 
 @Path("teacher")
 public class TeacherResource {

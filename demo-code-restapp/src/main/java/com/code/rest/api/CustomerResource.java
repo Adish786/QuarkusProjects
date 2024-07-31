@@ -1,4 +1,4 @@
-package com.ibm.rest.api;
+package com.code.rest.api;
 
 import jakarta.ws.rs.*;
 

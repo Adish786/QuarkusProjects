@@ -1,4 +1,4 @@
-package com.ibm.rest.api.parameters.path;
+package com.code.rest.api.parameters.path;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

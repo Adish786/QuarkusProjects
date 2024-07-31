@@ -1,4 +1,4 @@
-package org.rest;
+package org.code.rest;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

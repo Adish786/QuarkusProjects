@@ -1,6 +1,7 @@
-package com.ibm.rest.api.responses;
+package com.code.rest.api.responses;
 
-import com.ibm.rest.api.payload.entity.User;
+import com.code.rest.api.payload.entity.User;
+
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;

@@ -1,4 +1,4 @@
-package com.ibm.rest.api.payload.entity;
+package com.code.rest.api.payload.entity;
 
 public class Teacher {
     private Long id;

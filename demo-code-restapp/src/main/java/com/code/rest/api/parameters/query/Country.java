@@ -1,4 +1,4 @@
-package com.ibm.rest.api.parameters.query;
+package com.code.rest.api.parameters.query;
 
 
 import jakarta.ws.rs.DefaultValue;

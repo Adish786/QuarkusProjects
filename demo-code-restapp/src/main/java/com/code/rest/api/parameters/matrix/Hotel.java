@@ -1,4 +1,4 @@
-package com.ibm.rest.api.parameters.matrix;
+package com.code.rest.api.parameters.matrix;
 
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
