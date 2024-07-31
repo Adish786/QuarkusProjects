@@ -2,8 +2,10 @@ package com.code.rest.api.responses;
 
 import com.code.rest.api.payload.entity.User;
 
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("login")
@@ -11,6 +13,7 @@ public class LoginResource {
 
     //login
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response login(User user) {
         if (user.getUserName().equals("admin") && user.getPassword().equals("admin")) {
             String jwtToken = "bsddffvc232aw32xcd3asfafd";

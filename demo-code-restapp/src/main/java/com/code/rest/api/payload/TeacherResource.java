@@ -7,38 +7,33 @@ import java.util.List;
 
 import com.code.rest.api.payload.entity.Teacher;
 
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
+
 @Path("teacher")
 public class TeacherResource {
 
-    @POST
-    public String save(Teacher teacher) {
-        System.out.println(teacher);
-        return "saved";
-    }
-
-    //Return single Teacher
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Teacher getTeacher() {
-        return new Teacher(1l, "Subramanian", "Quarkus");
+    public Uni<Teacher> getTeacher() {
+        System.out.println(Thread.currentThread().getName());
+        Teacher teacher = new Teacher(1l,"Adish Ansari","Quarkus");
+        return Uni.createFrom().item(teacher);
     }
+
+  
 
     //Return Collection
     @GET
     @Path("list")
-    public List<Teacher> getTeachers() {
+    public Uni<List<Teacher>> getTeachers() {
+        System.out.println(Thread.currentThread().getName());
         List<Teacher> teacherList = List.of(
                 new Teacher(1l, "Subramanian", "Quarkus"),
                 new Teacher(2l, "Murugan", "Quarkus"),
                 new Teacher(3l, "Karthik", "Spring Framework")
         );
-        return teacherList;
+        return Uni.createFrom().item(teacherList);
     }
 
-    @DELETE
-    @Path("{Id}")
-    public void remove(@PathParam("Id") Long id) {
-        //return status is 204-No content
-        System.out.println("delete by Id" + id);
-    }
 }
