@@ -1,0 +1,1050 @@
+				Microservice Implementation
+.....................................................................................
+Microservices just archtecture, we can implement any language,any framework.
+
+Java implementation:
+1.Spring cloud
+2.Quarkus
+3.Vertx
+etc....
+.....................................................................................
+			Quarkus as Microservice implmentation
+.....................................................................................
+Quarkus is framework which implements the most of the microservice design patterns
+via Ecplise Microprofile specification.
+
+Micro Profile specification is  extension of "Microservice" design patterns.
+
+
+Domain Modeling
+................
+ProductCatelog Management
+Inventory Management
+OrderManagement
+DeliveryManagement
+
+Application Architecture
+
+ProductCataglog
+  ->Service
+
+What is service?
+
+  Service is mini application.
+  Service is sub domain in application 
+  For eg in Ecommerce domain "ProductCatglog" ,"Cusotmer Management","Order Management"
+
+How to implement service?
+
+  Service can be implemented as a java maven project...
+  Service has apis
+
+API: Application programming interface..
+ Which exposes biz logic 
+ Returns data , recevies data
+
+Service API Design:
+
+1.local api
+  apis are exposed within objects, called by other objects
+2.remote api
+  apis are exposed within objects, called by other objects/programs via networks
+
+Remote apis: (RPI)
+
+1.webservices
+   soap api /rest api/graphql api
+2.RPC
+   TCP api
+   Grpc apis
+3.MOM -Event Driven Microservices
+  Using kafka,Rabbitmq.
+..................................................................................
+			RestFull WebService Implementation
+..................................................................................
+         	  Microservice-HTTP Based Microservice
+  	  RESTFull Web Service using JAX-RS  Spec (Jakarta RESTful Web Services)
+		      using RESTEasy Framework
+.....................................................................................
+
+Jakarta RESTful Web Services is spec of JEE , implementation is RestEasy Framework..
+
+In Quarkus RestEasy has been modified for building non blocking apps
+
+
+ 			  QuarkusApp
+			      |
+	             Quarkus RestEasy Module
+			      |
+		         RestEasy Framwork
+			     |
+		   Jarkarta RestFull WebService
+
+RESTEasy:
+
+  RESTEasy is a JBoss / Red Hat project that provides various frameworks to help you build RESTful Web Services and RESTful Java applications. It is an implementation of the Jakarta RESTful Web Services, an Eclipse Foundation specification that provides a Java API for RESTful Web Services over the HTTP protocol.
+
+Moreover, RESTEasy also implements the MicroProfile REST Client specification API
+
+Quarkus team uses RESTEasy framework for building MicroService's REST API Design.
+
+Traditional RESTEasy apps are deployed on "Jboss,Apach Tomcat" like web containers.
+.....................................................................................
+			  Types of RESTFull Web services 
+
+1.Reactive web service - Highly Recommended
+2.Non Reactive web service - Not recommended
+
+
+By default,Rest apis are blocking, meaning that which is not handled by event loop thread.
+
+How to create rest api?
+
+Note:
+ Rest api we write based ON " jakarta RestFull WebServices" specification,Using Rest Easy Framwork.
+https://jakarta.ee/specifications/restful-ws/
+
+Step 1:
+create quarkus app rest-app
+
+Project Dependency:
+   <dependency>
+           <groupId>io.quarkus</groupId>
+           <artifactId>quarkus-rest</artifactId>
+   </dependency>
+
+Step 2:
+ Run quarkus app
+ >quarkus dev
+.....................................................................................
+			  REST API Core concepts
+.....................................................................................
+
+Resources:
+   Domain Model which expose api which are accessed by clients using urls 
+
+CustomerResource,ProductResource,PaymentResource etc....
+
+In Spring we call controller, in Quarkus we call "Resource"
+
+RESTEasy is annotation driven based on jakarta spec.
+
+package org.acme;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/hello")
+public class GreetingResource {
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello() {
+        return "Hello from Quarkus REST";
+    }
+}
+Common Annoations
+ Core Package
+jakarata.ws.rs
+
+
+@Path - to map url
+@GET -  http get
+@POST - http post
+@PUT -  http put
+@DELETE - http delete.
+.....................................................................................
+			  CURD operation
+...................................................................................
+
+
+package com.ibm.rest.api;
+
+import jakarta.ws.rs.*;
+
+@Path("customers")
+public class CustomerResource {
+    //api
+    @GET
+    public String findAll() {
+        return "Find all";
+    }
+    @POST
+    public String save(){
+        return  "Save";
+    }
+    @PUT
+    public String update(){
+        return  "update";
+    }
+    @DELETE
+    public String remove(){
+        return  "Remove";
+    }
+}
+.....................................................................................				 Nested URL
+
+Eg
+
+GET /products/reviews
+GET /customers/comments
+package com.ibm.rest.api;
+
+import jakarta.ws.rs.*;
+
+@Path("customers")
+public class CustomerResource {
+    //api
+    @GET
+    public String findAll() {
+        return "Find all";
+    }
+    @GET
+    @Path("comments")
+    public String getComments(){
+        return  "Comments";
+    }
+    @POST
+    public String save(){
+        return  "Save";
+    }
+    @PUT
+    public String update(){
+        return  "update";
+    }
+    @DELETE
+    public String remove(){
+        return  "Remove";
+    }
+}
+....................................................................................
+		 How to Pass data to REST API - Input Parameter
+....................................................................................
+Data can be passed to the End Point.
+
+1.Through url - path parameter,query parameter,matrix parameter
+                Matrix parameters are similar to query param, passing more than one 		parameter
+
+2.Through payload
+    Sending data part of the http body..
+
+
+Path Parameter:
+...............
+
+GET /customers/1
+GET /customers/2
+GET /customers/3
+
+package com.ibm.rest.api.parameters.path;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+
+@Path("books")
+public class BookResource {
+
+    //findBy Book
+    @GET
+    @Path("{Id}")
+    public String findById(@PathParam("Id") Long id){
+        return "Book By Id " + id;
+    }
+}
+
+Testing:
+ GET localhost:8080/books/1
+
+....................................................................................
+			  Query Parameters
+....................................................................................
+
+Passing more than one parameter
+
+GET books/pages?totalPages=34&unit=28
+
+package com.ibm.rest.api.parameters.query;
+
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
+
+@Path("countries")
+public class Country {
+
+    @GET
+    public String getCountryByState(@QueryParam("state") String state){
+        return  "State " + state;
+    }
+}
+.....................................................................................
+			Default Value for query parameter
+.....................................................................................
+package com.ibm.rest.api.parameters.query;
+
+
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
+
+@Path("countries")
+public class Country {
+
+    @GET
+    public String getCountryByState(@QueryParam("state") @DefaultValue("TN") String state){
+        return  "State " + state;
+    }
+}
+
+Testing:
+localhost:8080/countries?state=KA
+....................................................................................
+			Matrix Parameter
+....................................................................................
+
+Matrix parameters and query parameters are similar, but they are different from delimters.
+
+package com.ibm.rest.api.parameters.matrix;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.MatrixParam;
+import jakarta.ws.rs.Path;
+
+@Path("hotel")
+public class Hotel {
+
+    @GET
+    public String getHotelInfo(@MatrixParam("rating") String rating, @MatrixParam("location") String location, @MatrixParam("price") double price) {
+        return "Rating="+ rating + " Location=" + location + " Price=" + price;
+    }
+}
+
+Testing:
+localhost:8080/hotel;rating=8;location=Near By City Center;price=2000
+
+....................................................................................
+			 Default Value and Matrix Parameters
+...................................................................................
+package com.ibm.rest.api.parameters.matrix;
+
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.MatrixParam;
+import jakarta.ws.rs.Path;
+
+@Path("hotel")
+public class Hotel {
+
+    @GET
+    public String getHotelInfo(@MatrixParam("rating") @DefaultValue("0") String rating, @MatrixParam("location") @DefaultValue("Airport Near") String location, @MatrixParam("price") @DefaultValue("0.0") double price) {
+        return "Rating=" + rating + " Location=" + location + " Price=" + price;
+    }
+}
+
+Testing
+localhost:8080/hotel
+
+....................................................................................
+			How to pass payload (data) to REST API
+...................................................................................
+
+Generally data is submitted from client to rest api as "JSON,XML"
+
+
+package com.ibm.rest.api.payload.entity;
+
+public class Teacher {
+    private Long id;
+    private String name;
+    private String subject;
+
+    @Override
+    public String toString() {
+        return "Teacher{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", subject='" + subject + '\'' +
+                '}';
+    }
+
+    public Teacher() {
+    }
+
+    public Teacher(Long id, String name, String subject) {
+        this.id = id;
+        this.name = name;
+        this.subject = subject;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+}
+
+
+package com.ibm.rest.api.payload;
+
+import com.ibm.rest.api.payload.entity.Teacher;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+
+@Path("teacher")
+public class TeacherResource {
+
+    @POST
+    public String save(Teacher teacher){
+        System.out.println(teacher);
+        return "saved";
+    }
+}
+
+Testing 
+POST /teacher
+{
+    "id": 1,
+    "name": "Subramanian",
+    "subject": "Quarkus"
+}
+
+The response would be
+
+415 Unsupported Media Type
+
+By default Quarkus does not know how to convert JSON into java object..That means no json Parser
+
+Solution:
+ We need to install/add json parser dependency - Jason Parser.
+
+Before adding json paraser dependency, we need to disuccess one more concept
+
+.....................................................................................
+			Extension
+.....................................................................................
+
+What is extension?
+
+ extension is , project dependency- jar dependency.
+
+By default, you can have extensions, when we create new project.
+
+Think of Quarkus extensions are as your project dependencies.
+
+Extensions configure,boot and integrate a framework or technology into your quarkus application.
+
+They also do all of the heavy lifting of providing the right information to Graalvm For application to compile nativly.
+
+
+How do you manage extensions?
+  Management means - add,removing,list extensions
+
+There are two way to get  extensions?
+
+1.via maven or gradle
+2.via cli -quarkus command.
+
+
+  extension, ext          Configure extensions of an existing project.
+    list, ls              List platforms and extensions.
+    categories, cat       List extension categories.
+    add                   Add extension(s) to this project.
+    remove, rm            Remove extension(s) from this project.
+
+ext ls
+  to list current dependencies(extensions) in your project.
+
+G:\IBM\2024\Aug\Quarkus\restfullwebservices\restapp>quarkus ext ls
+Looking for the newly published extensions in registry.quarkus.io
+Current Quarkus extensions installed:
+
+? ArtifactId                                         Extension Name
+? quarkus-rest                                       REST
+
+https://quarkus.io/extensions/
+
+How to add extension?
+  JSON Parser - jackson
+
+  quarkus ext add io.quarkus:quarkus-rest-jackson
+
+./mvnw quarkus:add-extension -Dextensions="io.quarkus:quarkus-rest-jackson"
+
+../gradlew addExtension --extensions="io.quarkus:quarkus-rest-jackson"
+
+
+eg:
+package com.ibm.rest.api.payload;
+
+import com.ibm.rest.api.payload.entity.Teacher;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+
+@Path("teacher")
+public class TeacherResource {
+
+    @POST
+    public String save(Teacher teacher){
+        System.out.println(teacher);
+        return "saved";
+    }
+}
+
+Now you test rest api, you can see the data is coming.
+...................................................................................
+				Responses
+..................................................................................		
+What can be response?
+
+REST API return any one of the following as type
+
+1.String - plain/text
+2.Objects/Collections - application/json , application/xml
+3.void - No Return type , only Status - No Content
+4.Response - Response Object
+5.Reactive Type - Uni or Multi - Non Blocking api is enabled...
+
+
+String:
+@Path("/hello")
+public class GreetingResource {
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello() {
+        return "Hello from Quarkus REST";
+    }
+}
+
+Return objects and Collections:
+................................
+package com.ibm.rest.api.payload;
+
+import com.ibm.rest.api.payload.entity.Teacher;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+import java.util.List;
+
+@Path("teacher")
+public class TeacherResource {
+
+    //Return single Teacher
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Teacher getTeacher() {
+        return new Teacher(1l, "Subramanian", "Quarkus");
+    }
+
+    //Return Collection
+    @GET
+    @Path("list")
+    public List<Teacher> getTeachers() {
+        List<Teacher> teacherList = List.of(
+                new Teacher(1l, "Subramanian", "Quarkus"),
+                new Teacher(2l, "Murugan", "Quarkus"),
+                new Teacher(3l, "Karthik", "Spring Framework")
+        );
+        return teacherList;
+    }
+}
+....................................................................................
+			void
+...................................................................................
+
+if you are writing delete operation , if delete success i want to send only status code.
+    @DELETE
+    @Path("{Id}")
+    public void remove(@PathParam("Id") Long id) {
+        //return status is 204-No content
+        System.out.println("delete by Id" + id);
+    }
+.....................................................................................
+			Response - Response Object
+
+
+What is Advantage over Objects when we "Response" Object.
+
+You can send additional information along with response, like custom headers,tokens, some resource information.
+
+Response Object
+  Response Object used to send "Payload" along with meta data(http status code, other informations)
+
+HTTP Status Code:
+1.informational status  100 to 199- 1X
+2.success response -  200 - 299 - 2X
+3.Redirects - 300-399 - 3X
+4.Client Errors - 400-499 - 4X
+5.Server errors - 500 - 599 - 5X
+
+Response Class:
+Response is abstract class contains two factory api..
+
+public abstract Object getEntity()
+public abstract int getStatus()
+
+Builder class:
+
+public static ResponseBuilder status(int status)
+public static ResponseBuilder ok()
+
+
+package com.ibm.rest.api.responses;
+
+import com.ibm.rest.api.payload.entity.User;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Response;
+
+@Path("login")
+public class LoginResource {
+
+    //login
+    @POST
+    public Response login(User user) {
+        if (user.getUserName().equals("admin") && user.getPassword().equals("admin")) {
+            String jwtToken = "Abc23232323asfafd";
+            return Response.status(200).entity("Login success").header("auth-token", jwtToken).build();
+        }
+        return Response.status(400).entity("Login Failed").build();
+    }
+}
+package com.ibm.rest.api.payload.entity;
+
+public class User {
+    private String userName;
+    private String password;
+
+    public User() {
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userName='" + userName + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
+
+    public User(String userName, String password) {
+        this.userName = userName;
+        this.password = password;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}
+...................................................................................
+.....................................................................................	
+			 Reactive Response
+....................................................................................
+As we discussed already, Quarkus supports non blocking io arch.
+
+
+Quarkus is running on Vertx Engine
+
+Vertx engine uses non blocking infrastrastructure of the operating system.
+
+Vertx Provides threading model which are two types of threads.
+
+1.Non Blocking threads- Event Loop Threads.
+2.Blocking threads or Worker Pool threads
+
+Non Blocking threads or Event Loop Threads are used to multiplex the incoming requests.
+Vertx Engine provides per cpu core two threads, if i have 12 core, then i would have 24 threads to handle incoming requests.
+
+Worker pool threads are used to handle "Request Per  Thread model" - One request and one thread.
+
+           "By default all Rest api runs on "Worker Pool thread"."
+
+
+Testing Thread:
+................
+package com.ibm.rest.response.thread;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+@Path("workerThread")
+public class WorkerThreadResource {
+
+    @GET
+    public String runOnWorker() {
+        System.out.println(Thread.currentThread().getName());
+        return "Hello";
+    }
+
+}
+
+Response:
+executor-thread-1
+
+Here exector-thread-1 is "Blocking thread" meaning that our code is running request per thread model. 
+
+
+How to turn the code into non blocking code?
+ How to assign api call to "vertx-event loop threads"
+
+ if your endpoint method needs to accomplish an async or reactive task before being able to answer to the client, you can declare your method to return "Uni/Multi",
+in which case current http request to be turned as non blocking handled by "event loop thread", the current method will not return result immediately rather which suspends current http thread.
+
+
+package com.ibm.rest.response.thread;
+
+import io.smallrye.mutiny.Uni;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+import java.util.List;
+
+@Path("teachers")
+public class TeacherResource {
+
+    //Return single Teacher
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Uni<Teacher> getTeacher() {
+        System.out.println(Thread.currentThread().getName());
+        Teacher teacher = new Teacher(1l, "Subramanian", "Quarkus");
+        return Uni.createFrom().item(teacher);
+    }
+
+    //Return Collection
+    @GET
+    @Path("list")
+    public Uni<List<Teacher>> getTeachers() {
+        System.out.println(Thread.currentThread().getName());
+        List<Teacher> teacherList = List.of(
+                new Teacher(1l, "Subramanian", "Quarkus"),
+                new Teacher(2l, "Murugan", "Quarkus"),
+                new Teacher(3l, "Karthik", "Spring Framework")
+        );
+        return Uni.createFrom().item(teacherList);
+    }
+}
+
+Output:
+vert.x-eventloop-thread-1
+..................................................................................
+			Streaming -Sending item by item
+....................................................................................
+Sending sequence of values over period of time.
+
+How to stream values?
+ Using Multi
+
+package com.ibm.rest.response.thread;
+
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+import java.time.Duration;
+import java.util.List;
+
+@Path("stream")
+public class StreamingResource {
+
+    @GET
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public Multi<Long> stream() {
+        return Multi.createFrom().ticks().every(Duration.ofSeconds(1));
+    }
+
+    @GET
+    @Path("list")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public Multi<Integer> list() {
+
+        //return Multi.createFrom().iterable(List.of(1, 2, 3, 4, 5, 6));
+        return Multi.createFrom()
+                .iterable(List.of(1, 2, 3, 4, 5, 6, 7, 90))
+                .onItem().call(i -> {
+                    Duration delay = Duration.ofSeconds(1);
+                    return Uni.createFrom().nullItem().onItem().delayIt().by(delay);
+                });
+    }
+
+    @GET
+    @Path("teacher")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public Multi<Teacher> teacherList() {
+        List<Teacher> teacherList = List.of(
+                new Teacher(1l, "Subramanian", "Quarkus"),
+                new Teacher(2l, "Murugan", "Quarkus"),
+                new Teacher(3l, "Karthik", "Spring Framework")
+        );
+        return Multi.createFrom()
+                .iterable(teacherList)
+                .onItem().call(i -> {
+                    Duration delay = Duration.ofSeconds(1);
+                    return Uni.createFrom().nullItem().onItem().delayIt().by(delay);
+                });
+    }
+}
+.....................................................................................
+.....................................................................................
+			Blocking and Non Blocking Threading Models
+
+Quarkus(Vertx) provides two types of threads
+
+1.Event loop thread
+   Thread which is used to build non blocking apps
+   Vertx(Quarkus) provides limited no threads to handle large concurrency
+   Quarkus enables event loop thread is activated to handle incoming request by 
+   Mutiny type called "Uni or Multi"
+
+2.Worker loop thread
+    It is Request Per thread model threads, when ever new request comes, quarkus allocats new a spearate thread for that request , that thread cant be reused by other request.
+
+.................................................................................
+		The Golden Rule - Don’t Block the Event Loop thread
+.................................................................................
+
+Caution:
+  You should not write any code  which blocks event loop thread.
+
+if you block event loop thread, vertx engine throws warning and error(Thread Blocked Exception).
+
+if the code is executed by "Event loop thread", inside that code we should not write any code which blocks that thread....
+
+What are the code which blocks event loop thread.
+
+1.Thread.sleep()
+2.Waiting on a lock
+3.Waiting on a mutex or monitor (e.g. synchronized section)
+4.Doing a long lived database operation and waiting for a result
+5.Doing a complex calculation that takes some significant time.
+6.Spinning in a loop
+
+
+I am going to simulate using Thread.sleep how to block event loop thread, then what will happen if you block.
+
+package com.ibm.rest.response.thread;
+
+import io.smallrye.mutiny.Uni;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+@Path("blocking")
+public class BlockingEventLoopResource {
+
+    @GET
+    public Uni<String> hello() throws InterruptedException {
+        System.out.println(Thread.currentThread().getName());
+        //write a code which blocks the current event loop thread
+
+        //here i block the thread for 1000ms
+        //Thread.sleep(1000);
+
+        //here i block the thread for 5000ms
+        Thread.sleep(5000);
+        return Uni.createFrom().item("Hello");
+    }
+}
+After increasing time we got exception
+
+2024-03-14 15:30:51,826 WARN  [io.ver.cor.imp.BlockedThreadChecker] (vertx-blocked-thread-checker) Thread Thread[vert.x-eventloop-thread-1,5,main] has been blocked for 2572 ms, time limit is 2000 ms: io.vertx.core.VertxException: Thread blocked.
+
+
+Here we can that got exception, the reason because the thread has been blocked for  more time.
+
+Generally event loop thread can be blocked only for 2000ms which is default time out 
+
+beyond that if try to block, Vertx will throw Exception, called "Thread Blocked"
+Exception.
+
+.....................................................................................
+
+What if i want to write blocking operations inside the nonblocking code which returns Reactive?
+@GET
+    public Uni<String> hello() throws InterruptedException {
+        System.out.println(Thread.currentThread().getName());
+        //write a code which blocks the current event loop thread
+
+        //here i block the thread for 1000ms
+        //Thread.sleep(1000);
+
+        //here i block the thread for 5000ms
+        Thread.sleep(5000);
+        return Uni.createFrom().item("Hello");
+    }
+
+Solution:
+  There is annotation called @Blocking
+
+package com.ibm.rest.response.thread;
+
+import io.smallrye.common.annotation.Blocking;
+import io.smallrye.mutiny.Uni;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+@Path("blocking")
+public class BlockingEventLoopResource {
+
+    @GET
+    @Blocking
+    public Uni<String> hello() throws InterruptedException {
+        System.out.println(Thread.currentThread().getName());
+        //write a code which blocks the current event loop thread
+
+        //here i block the thread for 1000ms
+        //Thread.sleep(1000);
+
+        //here i block the thread for 5000ms
+        Thread.sleep(5000);
+        return Uni.createFrom().item("Hello");
+    }
+}
+
+ Even though you return Reactive type, now this code will run in worker pool thread only.
+....................................................................................
+What if i want to run my code in delayed manner in async way in non blocking thread
+i cant use Thread.sleep
+
+>Thread.sleep => which is blocking scheduler
+>onItem.delayIt() =>  Which is reactive scheduler
+
+package com.ibm.rest.response.thread;
+
+import io.smallrye.common.annotation.Blocking;
+import io.smallrye.mutiny.Uni;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Response;
+
+import java.time.Duration;
+
+@Path("blocking")
+public class BlockingEventLoopResource {
+
+    @GET
+    @Blocking
+    public Uni<String> hello() throws InterruptedException {
+        System.out.println(Thread.currentThread().getName());
+        //write a code which blocks the current event loop thread
+
+        //here i block the thread for 1000ms
+        //Thread.sleep(1000);
+
+        //here i block the thread for 5000ms
+        Thread.sleep(5000);
+        return Uni.createFrom().item("Hello");
+    }
+
+    @GET
+    @Path("reactivescheduler")
+    public Uni<Response> getResponseWithDelay() throws InterruptedException {
+        System.out.println(Thread.currentThread().getName());
+        return Uni.createFrom().item("Hello")
+                .onItem()
+                .transform(f -> Response.ok(f).header("message", "How are you"))
+                .onItem()
+                .delayIt().by(Duration.ofMillis(6000))
+                .onItem()
+                .transform(Response.ResponseBuilder::build);
+    }
+
+}
+....................................................................................				 Exception Handling
+....................................................................................
+
+if any application exception happens we nee to handle and convert into meaningfull response.
+
+In order to handle exception in Quarkus, jakarta provides base class called "
+jakarta.ws.rs.WebApplicationException"
+
+
+Step:
+1.Exception mapper is class which converts any exception into Http success Response.
+
+package com.ibm.rest.api.exception;
+
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
+
+@Provider
+public class WebApplicationExceptionMapper implements ExceptionMapper<WebApplicationException> {
+
+    @Override
+    public Response toResponse(WebApplicationException e) {
+        return Response.ok().entity(e.getMessage()).build();
+    }
+}
+
+2.Resource Class where we can test Exception.
+
+package com.ibm.rest.api.exception;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.WebApplicationException;
+
+@Path("exception")
+public class ExceptionTesterResource {
+
+    @Path("{name}")
+    @GET
+    public String getName(@PathParam("name") String name) {
+        if (name.equals("admin")) {
+            return "Hello " + name;
+        }
+        throw new WebApplicationException("Name is not found!");
+    }
+}
+
+
+
+
+
+
+
