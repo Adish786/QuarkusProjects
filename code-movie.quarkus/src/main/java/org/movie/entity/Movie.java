@@ -1,7 +1,11 @@
 package org.movie.entity;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
+@Schema(name = "Movie",description = "Movie rapresentation")
 public class Movie {
 private Long id;
+@Schema(required = true)
 private String title;
 public Long getId() {
 	return id;
