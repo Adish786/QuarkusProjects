@@ -111,7 +111,7 @@ public class MovieResource {
 					description = "Movie title",
 					required = true
 			)
-			@PathParam("name") String title) {
+			@PathParam("title") String title) {
 		movies = movies.stream().map(movie -> {
 			if (movie.getId().equals(id)) {
 				movie.setTitle(title);
