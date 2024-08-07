@@ -1,4 +1,4 @@
-package org.acme;
+package org.acme.resource;
 
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheInvalidateAll;
@@ -7,7 +7,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
 @Path("/hello")
-public class GreetingResource {
+public class PersonResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)

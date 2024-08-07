@@ -1,4 +1,4 @@
-package org.acme;
+package org.acme.model;
 
 public class Person {
     private Long id;
