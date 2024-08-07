@@ -1,11 +1,9 @@
 package org.acme;
 
 import io.quarkus.cache.CacheInvalidate;
+import io.quarkus.cache.CacheInvalidateAll;
 import io.quarkus.cache.CacheResult;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
 @Path("/hello")
@@ -22,6 +20,14 @@ public class GreetingResource {
     @DELETE
     @CacheInvalidate(cacheName ="hello")
     public void invalidCache(){
+    }
+    @POST
+    @CacheInvalidateAll(cacheName = "expensiveResourceCache")
+    public void invalidateAll() {
 
     }
+
+
+
+
 }
